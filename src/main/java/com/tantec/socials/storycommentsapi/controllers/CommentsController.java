@@ -32,10 +32,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestController
-@RequestMapping(path = "/api/stories/comments")
+@RequestMapping(path = "/api/stories/{storyId}/comments")
 @CrossOrigin(allowedHeaders = CommonConstants.SYMBOLS_ASTERISK, methods = { RequestMethod.GET, RequestMethod.POST,
         RequestMethod.PUT, RequestMethod.DELETE })
 public class CommentsController {
@@ -51,6 +50,7 @@ public class CommentsController {
     @PostMapping(path = "", produces = "application/json")
     public ResponseEntity<CommentCreateResponse> saveComment(
             @RequestHeader(name = "ACTIVE-USER-ID", required = true) BigInteger userId,
+            @PathVariable(name = "storyId") BigInteger storyId,
             @RequestBody CommentRequestObject requestBody) {
 
         if (!requestBody.validateComment(requestBody)) {
@@ -59,7 +59,7 @@ public class CommentsController {
             Date currentTime = new Date();
             Comment comment = new Comment();
             comment.setContent(requestBody.getContent());
-            comment.setStoryId(requestBody.getStoryId());
+            comment.setStoryId(storyId);
             comment.setUserId(userId);
             comment.setEdited(false);
             comment.setLastUpdatedTimestamp(currentTime);

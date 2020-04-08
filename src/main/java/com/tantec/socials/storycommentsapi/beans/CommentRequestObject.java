@@ -17,11 +17,6 @@ public class CommentRequestObject {
     @NotNull
     private String content;
 
-    @Getter
-    @Setter
-    @NotNull
-    private BigInteger storyId;
-
     public CommentRequestObject() {
         this.content = "";
     }
