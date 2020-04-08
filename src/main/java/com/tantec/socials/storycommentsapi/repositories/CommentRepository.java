@@ -17,16 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface CommentRepository extends CrudRepository<Comment, BigInteger> {
 
-    @Query(value = "SELECT * FROM comment WHERE story_id = :storyId")
+    @Query(value = "SELECT * FROM comment WHERE story_id = :storyId", nativeQuery = true)
     public Optional<List<Comment>> findByStoryId(@Param("storyId") BigInteger storyId);
 
-    @Query(value = "SELECT * FROM comment WHERE user_id = :userId")
+    @Query(value = "SELECT * FROM comment WHERE user_id = :userId", nativeQuery = true)
     public Optional<List<Comment>> findByUserId(@Param("userId") BigInteger userId);
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE comment SET content = :content, last_updated_timestamp = :lastUpdatedTimestamp, is_edited = true WHERE comment_id = :id",
-            nativeQuery = true)
-    public void updateComment(@Param("id") BigInteger id, @Param("content") String content, @Param("lastUpdatedTimestamp") Date lastUpdatedTimestamp);
+    @Query(value = "UPDATE comment SET content = :content, last_updated_timestamp = :lastUpdatedTimestamp, is_edited = true WHERE comment_id = :id", nativeQuery = true)
+    public void updateComment(@Param("id") BigInteger id, @Param("content") String content,
+            @Param("lastUpdatedTimestamp") Date lastUpdatedTimestamp);
 
 }

@@ -1,5 +1,6 @@
 package com.tantec.socials.storycommentsapi.beans;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -13,15 +14,21 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name = "comment_history")
-public class CommentHistory {
+@Table(name = "comment_history", schema = "public")
+@ToString(callSuper = true, includeFieldNames = true)
+public class CommentHistory implements Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8215159729946221886L;
 
     @Id
     @Getter
     @Setter
-    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "historyId")
     private BigInteger historyId;

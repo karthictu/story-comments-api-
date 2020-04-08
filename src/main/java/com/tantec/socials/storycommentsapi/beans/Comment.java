@@ -1,5 +1,6 @@
 package com.tantec.socials.storycommentsapi.beans;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -13,15 +14,21 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name = "comment")
-public class Comment {
+@Table(name = "comment", schema = "public")
+@ToString(callSuper = true, includeFieldNames = true)
+public class Comment implements Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 5641740512895828818L;
 
     @Id
     @Getter
     @Setter
-    @NotNull
     @Column(name = "commentId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;    
@@ -47,7 +54,7 @@ public class Comment {
     @Getter
     @Setter
     @NotNull
-    @Column(name = "lastUpdatedTimestamp")
+    @Column(name = "isEdited")
     private boolean isEdited;
 
     @Getter
@@ -57,6 +64,7 @@ public class Comment {
     private Date lastUpdatedTimestamp;
 
     public Comment() {
+        super();
         this.content = "";
         this.lastUpdatedTimestamp = new Date();
     }

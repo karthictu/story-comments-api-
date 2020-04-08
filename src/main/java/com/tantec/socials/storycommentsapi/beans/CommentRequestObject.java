@@ -20,11 +20,6 @@ public class CommentRequestObject {
     @Getter
     @Setter
     @NotNull
-    private BigInteger userId;
-
-    @Getter
-    @Setter
-    @NotNull
     private BigInteger storyId;
 
     public CommentRequestObject() {
@@ -32,8 +27,7 @@ public class CommentRequestObject {
     }
 
     public boolean validateComment(CommentRequestObject obj) {
-        if ((obj.getContent() != null && !obj.getContent().isBlank())
-                && obj.getUserId() != null && obj.getStoryId() != null) {
+        if ((obj.getContent() != null && !obj.getContent().isBlank())) {
             return true;
         } else {
             return false;

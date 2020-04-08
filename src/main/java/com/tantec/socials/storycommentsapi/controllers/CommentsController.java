@@ -16,6 +16,8 @@ import com.tantec.socials.storycommentsapi.constants.CommonConstants;
 import com.tantec.socials.storycommentsapi.services.CommentHistoryService;
 import com.tantec.socials.storycommentsapi.services.CommentService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @CrossOrigin(allowedHeaders = CommonConstants.SYMBOLS_ASTERISK, methods = { RequestMethod.GET, RequestMethod.POST,
         RequestMethod.PUT, RequestMethod.DELETE })
 public class CommentsController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentsController.class);
 
     @Autowired
     CommentService commentService;
@@ -60,11 +64,12 @@ public class CommentsController {
             comment.setEdited(false);
             comment.setLastUpdatedTimestamp(currentTime);
 
-            comment = commentService.saveComment(comment);
-            if (comment == null) {
+            Object obj = commentService.saveComment(comment);
+            LOGGER.info("COmment: " + comment.toString());
+            if (obj == null) {
                 return new ResponseEntity<CommentCreateResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else {
-                CommentCreateResponse response = new CommentCreateResponse(comment.getId(), CommonConstants.SUCCESS);
+                CommentCreateResponse response = new CommentCreateResponse(((Comment) obj).getId(), CommonConstants.SUCCESS);
                 return new ResponseEntity<CommentCreateResponse>(response, HttpStatus.CREATED);
             }
         }
@@ -93,7 +98,7 @@ public class CommentsController {
     }
 
     @GetMapping(path = "{id}", produces = "application/json")
-    public ResponseEntity<Comment> getComment(@PathVariable BigInteger commentId) {
+    public ResponseEntity<Comment> getComment(@PathVariable(name = "id") BigInteger commentId) {
         Comment comment = commentService.findCommentById(commentId);
 
         if (comment == null) {
@@ -107,7 +112,7 @@ public class CommentsController {
     public ResponseEntity<Comment> editComment(
             @RequestHeader(name = "ACTIVE-USER-ID", required = true) BigInteger userId,
             @RequestBody CommentRequestObject requestBody,
-            @PathVariable BigInteger id) {
+            @PathVariable(name = "id") BigInteger id) {
         if (requestBody.validateComment(requestBody)) {
             Date currentTime = new Date();
 
@@ -136,22 +141,22 @@ public class CommentsController {
     @DeleteMapping(path = "{id}", produces = "application/json")
     public ResponseEntity<Comment> deleteComment(
             @RequestHeader(name = "ACTIVE-USER-ID", required = true) BigInteger userId,
-            @PathVariable BigInteger id) {
-        commentService.deleteComment(id);
+            @PathVariable(name = "id") BigInteger id) {
         commentHistoryService.deleteHistoryByCommentId(id);
+        commentService.deleteComment(id);        
         return new ResponseEntity<Comment>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(path = "{id}/edit-history", produces = "application/json")
     public ResponseEntity<CommentHistoryResponse> getEditHistoryForComment(
             @RequestHeader(name = "ACTIVE-USER-ID", required = true) BigInteger userId,
-            @PathVariable BigInteger commentId) {
+            @PathVariable(name = "id") BigInteger commentId) {
 
         CommentHistoryResponse response = new CommentHistoryResponse();
         List<CommentHistory> historyList = commentHistoryService.searchHistoryByCommentId(commentId);
 
         if (historyList == null)
-            return new ResponseEntity<CommentHistoryResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<CommentHistoryResponse>(HttpStatus.NOT_FOUND);
         else {
             response.setCommentId(commentId);
 
@@ -161,7 +166,7 @@ public class CommentsController {
                 responseObj.setCreatedTimestamp(historyObj.getCreatedTimestamp());
                 response.addHistory(responseObj);
             }
-            return new ResponseEntity<CommentHistoryResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<CommentHistoryResponse>(response, HttpStatus.OK);
         }
     }
 
